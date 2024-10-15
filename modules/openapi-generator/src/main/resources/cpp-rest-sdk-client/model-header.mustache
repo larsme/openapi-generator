@@ -55,6 +55,16 @@ public:
         return true;
     }
 
+    template <std::size_t I = 0>
+    bool fromJson(const web::json::value& json) {
+        if constexpr (I < std::variant_size_v<VariantType>)
+        {
+          bool parsed = fromJson<std::variant_alternative_t<I, VariantType>>(json);
+          return parsed ? true : fromJson<I + 1>(json);
+        }
+        return false;
+    }
+
     void toMultipart(std::shared_ptr<MultipartFormData> multipart, const utility::string_t& namePrefix) const;
 
     template<typename Target>
